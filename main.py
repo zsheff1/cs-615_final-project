@@ -1,0 +1,137 @@
+#!/usr/bin/env python3
+
+## import modules
+import math
+import numpy as np
+from framework import (
+    Model, InputLayer, ResidualBlock, FullyConnectedLayer, ReLULayer, DropoutLayer, LinearLayer, SquaredError
+)
+import matplotlib.pyplot as plt
+
+
+## define constants
+DATA_PATH = 'medical.csv'
+TRAIN_TEST_SPLIT = 2/3
+TERMINATE_EPOCH = 1e1
+TERMINATE_RMSE = 1e-10
+
+
+## import data, split into training and test
+data = np.genfromtxt(DATA_PATH, delimiter=',', skip_header=1)
+
+n_train = math.floor(data.shape[0] * TRAIN_TEST_SPLIT)
+training_indices = np.random.choice(data.shape[0], size=n_train, replace=False)
+mask = np.zeros(data.shape[0], dtype=bool)
+mask[training_indices] = True
+
+X_train = data[mask, :-1]
+X_test = data[~mask, :-1]
+Y_train = data[mask, -1].reshape(-1, 1)
+Y_test = data[~mask, -1].reshape(-1, 1)
+
+
+## instantiate models
+# shallow model
+DIMENSIONALITY = [9, 1]
+
+model_1 = Model(
+    InputLayer(X_train),
+
+    FullyConnectedLayer(DIMENSIONALITY[0], DIMENSIONALITY[1], ReLULayer),
+    ReLULayer(),
+
+    SquaredError()
+)
+
+# deep model without skip residuals
+DIMENSIONALITY = [9, 18, 32, 18, 9, 1]
+DROPOUT_PROBABILITY = 0.1
+
+model_2 = Model(
+    InputLayer(X_train),
+
+    FullyConnectedLayer(DIMENSIONALITY[0], DIMENSIONALITY[1], ReLULayer),
+    ReLULayer(),
+    DropoutLayer(DROPOUT_PROBABILITY),
+
+    FullyConnectedLayer(DIMENSIONALITY[1], DIMENSIONALITY[2], ReLULayer),
+    ReLULayer(),
+    DropoutLayer(DROPOUT_PROBABILITY),
+
+    FullyConnectedLayer(DIMENSIONALITY[2], DIMENSIONALITY[3], ReLULayer),
+    ReLULayer(),
+    DropoutLayer(DROPOUT_PROBABILITY),
+
+    FullyConnectedLayer(DIMENSIONALITY[3], DIMENSIONALITY[4], ReLULayer),
+    ReLULayer(),
+    DropoutLayer(DROPOUT_PROBABILITY),
+
+    FullyConnectedLayer(DIMENSIONALITY[4], DIMENSIONALITY[5], LinearLayer),
+    LinearLayer(),
+    
+    SquaredError()
+)
+
+# deep model with skip residuals
+DIMENSIONALITY = [9, 18, 32, 18, 9, 1]
+DROPOUT_PROBABILITY = 0.1
+
+model_3 = Model(
+    InputLayer(X_train),
+
+    ResidualBlock(
+        FullyConnectedLayer(DIMENSIONALITY[0], DIMENSIONALITY[0], ReLULayer),
+        ReLULayer(),
+        DropoutLayer(DROPOUT_PROBABILITY),
+
+        FullyConnectedLayer(DIMENSIONALITY[0], DIMENSIONALITY[0], ReLULayer),
+        ReLULayer(),
+        DropoutLayer(DROPOUT_PROBABILITY),
+    ),
+
+        FullyConnectedLayer(DIMENSIONALITY[0], DIMENSIONALITY[-1], ReLULayer),
+        LinearLayer(),
+
+    SquaredError()
+)
+
+
+## train models
+training_logs = []
+for model in model_1, model_2, model_3:
+
+    # initialize helper variables
+    rmse_train = float('inf')
+    delta_rmse = float('inf')
+    rows = []
+
+    while (model.getEpoch() < TERMINATE_EPOCH) and (delta_rmse > TERMINATE_RMSE):
+        # training
+        model.train(X_train, Y_train)
+
+        # evaluate
+        rmse_train_old = rmse_train
+        rmse_train = model.eval(X_train, Y_train, "RMSE")
+        rmse_test = model.eval(X_test, Y_test, "RMSE")
+        
+        # update termination criteria
+        rows.append([model.getEpoch(), rmse_train, rmse_test])
+        delta_rmse = abs(rmse_train - rmse_train_old)
+
+    # save results
+    training_logs.append(np.array(rows))
+
+
+## display results
+for training_log, model_name in zip(training_logs, ['Shallow Network', 'Deep Network Without Skip Residuals', 'Deep Network With Skip Residuals']):
+    plt.plot(training_log[:, 0], training_log[:, 1], label='Training')
+    plt.plot(training_log[:, 0], training_log[:, 2], label='Testing')
+    plt.title(model_name)
+    plt.xlabel('Epoch')
+    plt.ylabel('RMSE')
+    plt.legend()
+    plt.grid(True)
+    plt.show()
+
+    # print error of final epoch
+    print(f"{model_name}\nFinal RMSE of training data: {training_log[-1, 1]}\nFinal RMSE of testing data: {training_log[-1, 2]}\n")
