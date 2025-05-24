@@ -41,20 +41,6 @@ Y_test = data[~mask, -1].reshape(-1, 1)
 model_1 = Model(
     InputLayer(X_train),
 
-    FullyConnectedLayer(DIMENSIONALITY[0], DIMENSIONALITY[0], ReLULayer),
-    ReLULayer(),
-    DropoutLayer(DROPOUT_PROBABILITY),
-
-    FullyConnectedLayer(DIMENSIONALITY[0], DIMENSIONALITY[-1], LinearLayer),
-    LinearLayer(),
-
-    SquaredError()
-)
-
-# deep model without skip residuals
-model_2 = Model(
-    InputLayer(X_train),
-
     FullyConnectedLayer(DIMENSIONALITY[0], DIMENSIONALITY[1], ReLULayer),
     ReLULayer(),
     DropoutLayer(DROPOUT_PROBABILITY),
@@ -77,19 +63,143 @@ model_2 = Model(
     SquaredError()
 )
 
+# deep model without skip residuals
+model_2 = Model(
+    InputLayer(X_train),
+
+    FullyConnectedLayer(DIMENSIONALITY[0], DIMENSIONALITY[1], ReLULayer),
+    ReLULayer(),
+    DropoutLayer(DROPOUT_PROBABILITY),
+
+    *(
+        layer
+        for _ in range(LAYER_REPEATS)
+        for layer in (
+            FullyConnectedLayer(DIMENSIONALITY[1], DIMENSIONALITY[1], ReLULayer),
+            ReLULayer(),
+            DropoutLayer(DROPOUT_PROBABILITY)
+        )
+    ),
+
+    FullyConnectedLayer(DIMENSIONALITY[1], DIMENSIONALITY[2], ReLULayer),
+    ReLULayer(),
+    DropoutLayer(DROPOUT_PROBABILITY),
+
+    *(
+        layer
+        for _ in range(LAYER_REPEATS)
+        for layer in (
+            FullyConnectedLayer(DIMENSIONALITY[2], DIMENSIONALITY[2], ReLULayer),
+            ReLULayer(),
+            DropoutLayer(DROPOUT_PROBABILITY)
+        )
+    ),
+
+    FullyConnectedLayer(DIMENSIONALITY[2], DIMENSIONALITY[3], ReLULayer),
+    ReLULayer(),
+    DropoutLayer(DROPOUT_PROBABILITY),
+
+    *(
+        layer
+        for _ in range(LAYER_REPEATS)
+        for layer in (
+            FullyConnectedLayer(DIMENSIONALITY[3], DIMENSIONALITY[3], ReLULayer),
+            ReLULayer(),
+            DropoutLayer(DROPOUT_PROBABILITY)
+        )
+    ),
+
+    FullyConnectedLayer(DIMENSIONALITY[3], DIMENSIONALITY[4], ReLULayer),
+    ReLULayer(),
+    DropoutLayer(DROPOUT_PROBABILITY),
+
+    *(
+        layer
+        for _ in range(LAYER_REPEATS)
+        for layer in (
+            FullyConnectedLayer(DIMENSIONALITY[4], DIMENSIONALITY[4], ReLULayer),
+            ReLULayer(),
+            DropoutLayer(DROPOUT_PROBABILITY)
+        )
+    ),
+
+    FullyConnectedLayer(DIMENSIONALITY[4], DIMENSIONALITY[5], LinearLayer),
+    LinearLayer(),
+    
+    SquaredError()
+)
+
 # deep model with skip residuals
 model_3 = Model(
     InputLayer(X_train),
 
+    FullyConnectedLayer(DIMENSIONALITY[0], DIMENSIONALITY[1], ReLULayer),
+    ReLULayer(),
+    DropoutLayer(DROPOUT_PROBABILITY),
+
     ResidualBlock(
-        FullyConnectedLayer(DIMENSIONALITY[0], DIMENSIONALITY[0], ReLULayer),
-        ReLULayer(),
-        DropoutLayer(DROPOUT_PROBABILITY),
+        *(
+            layer
+            for _ in range(LAYER_REPEATS)
+            for layer in (
+                FullyConnectedLayer(DIMENSIONALITY[1], DIMENSIONALITY[1], ReLULayer),
+                ReLULayer(),
+                DropoutLayer(DROPOUT_PROBABILITY)
+            )
+        )
     ),
 
-    FullyConnectedLayer(DIMENSIONALITY[0], DIMENSIONALITY[-1], LinearLayer),
-    LinearLayer(),
+    FullyConnectedLayer(DIMENSIONALITY[1], DIMENSIONALITY[2], ReLULayer),
+    ReLULayer(),
+    DropoutLayer(DROPOUT_PROBABILITY),
 
+    ResidualBlock(
+        *(
+            layer
+            for _ in range(LAYER_REPEATS)
+            for layer in (
+                FullyConnectedLayer(DIMENSIONALITY[2], DIMENSIONALITY[2], ReLULayer),
+                ReLULayer(),
+                DropoutLayer(DROPOUT_PROBABILITY)
+            )
+        )
+    ),
+
+    FullyConnectedLayer(DIMENSIONALITY[2], DIMENSIONALITY[3], ReLULayer),
+    ReLULayer(),
+    DropoutLayer(DROPOUT_PROBABILITY),
+
+    ResidualBlock(
+        *(
+            layer
+            for _ in range(LAYER_REPEATS)
+            for layer in (
+                FullyConnectedLayer(DIMENSIONALITY[3], DIMENSIONALITY[3], ReLULayer),
+                ReLULayer(),
+                DropoutLayer(DROPOUT_PROBABILITY)
+            )
+        )
+    ),
+
+    FullyConnectedLayer(DIMENSIONALITY[3], DIMENSIONALITY[4], ReLULayer),
+    ReLULayer(),
+    DropoutLayer(DROPOUT_PROBABILITY),
+
+    ResidualBlock(
+        *(
+            layer
+            for _ in range(LAYER_REPEATS)
+            for layer in (
+                FullyConnectedLayer(DIMENSIONALITY[4], DIMENSIONALITY[4], ReLULayer),
+                ReLULayer(),
+                DropoutLayer(DROPOUT_PROBABILITY)
+            )
+        )
+    ),
+
+    FullyConnectedLayer(DIMENSIONALITY[4], DIMENSIONALITY[5], LinearLayer),
+    LinearLayer(),
+    
     SquaredError()
 )
 
