@@ -250,7 +250,7 @@ for model in model_1, model_2, model_3:
 
 
 ## display results
-for training_log, model_name in zip(training_logs, ['Shallow Network', 'Deep Network Without Skip Residuals', 'Deep Network With Skip Residuals']):
+for training_log, model_name in zip(training_logs, ['Shallow Network', 'Deep Network', 'Deep Network With Skip Residuals']):
     plt.plot(training_log[:, 0], training_log[:, 1], label='Training')
     plt.plot(training_log[:, 0], training_log[:, 2], label='Testing')
     plt.title(model_name)
