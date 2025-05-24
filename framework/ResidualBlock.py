@@ -7,26 +7,22 @@ class ResidualBlock(Layer):
     def __init__(self, *layers):
         super().__init__()
 
-        self.__layers = layers
         dims = [layer.getWeights().shape for layer in layers if hasattr(layer, 'getWeights')]
         sizeIn, sizeOut = dims[0][0], dims[-1][1]
+        if sizeIn != sizeOut:
+            raise ValueError(
+                """Input size must match output size.
+                Change dimensionality between residual blocks, not within them."""
+            )
 
-        if sizeIn == sizeOut:
-            self.__projection = LinearLayer()
-        else:
-            self.__projection = FullyConnectedLayer(sizeIn, sizeOut, LinearLayer)
+        self.__layers = layers
+        self.__projection = LinearLayer()
     
     def getLayers(self):
         return self.__layers
         
     def setLayers(self, layers):
         self.__layers = layers
-    
-    def getProjection(self):
-        return self.__projection
-    
-    def setProjection(self, projection):
-        self.__projection = projection
 
     def forward(self, dataIn):
         self.setPrevIn(dataIn)
@@ -76,6 +72,3 @@ class ResidualBlock(Layer):
             if hasattr(self.__layers[i], 'learn'):
                 self.__layers[i].learn(grad, t)
             grad = newgrad
-
-        if hasattr(self.__projection, 'learn'):
-            self.__projection.learn(gradIn, t)
