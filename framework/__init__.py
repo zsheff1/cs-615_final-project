@@ -17,8 +17,5 @@ from .LinearLayer import LinearLayer
 from .ReLULayer import ReLULayer
 from .LogisticSigmoidLayer import LogisticSigmoidLayer
 from .TanhLayer import TanhLayer
-from .SoftmaxLayer import SoftmaxLayer
 
 from .SquaredError import SquaredError
-from .LogLoss import LogLoss
-from .CrossEntropy import CrossEntropy
