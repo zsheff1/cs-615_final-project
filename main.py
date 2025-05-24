@@ -5,7 +5,7 @@ import math
 import kagglehub
 import numpy as np
 from framework import (
-    Model, InputLayer, ResidualBlock, FullyConnectedLayer, ReLULayer, DropoutLayer, LinearLayer, SquaredError
+    Model, InputLayer, ResidualBlock, FullyConnectedLayer, ReLULayer, DropoutLayer, LinearLayer, SquaredError, NormalizationLayer
 )
 import matplotlib.pyplot as plt
 import os
@@ -42,18 +42,22 @@ model_1 = Model(
     InputLayer(X_train),
 
     FullyConnectedLayer(DIMENSIONALITY[0], DIMENSIONALITY[1], ReLULayer),
+    NormalizationLayer(DIMENSIONALITY[1]),
     ReLULayer(),
     DropoutLayer(DROPOUT_PROBABILITY),
 
     FullyConnectedLayer(DIMENSIONALITY[1], DIMENSIONALITY[2], ReLULayer),
+    NormalizationLayer(DIMENSIONALITY[2]),
     ReLULayer(),
     DropoutLayer(DROPOUT_PROBABILITY),
 
     FullyConnectedLayer(DIMENSIONALITY[2], DIMENSIONALITY[3], ReLULayer),
+    NormalizationLayer(DIMENSIONALITY[3]),
     ReLULayer(),
     DropoutLayer(DROPOUT_PROBABILITY),
 
     FullyConnectedLayer(DIMENSIONALITY[3], DIMENSIONALITY[4], ReLULayer),
+    NormalizationLayer(DIMENSIONALITY[4]),
     ReLULayer(),
     DropoutLayer(DROPOUT_PROBABILITY),
 
@@ -68,6 +72,7 @@ model_2 = Model(
     InputLayer(X_train),
 
     FullyConnectedLayer(DIMENSIONALITY[0], DIMENSIONALITY[1], ReLULayer),
+    NormalizationLayer(DIMENSIONALITY[1]),
     ReLULayer(),
     DropoutLayer(DROPOUT_PROBABILITY),
 
@@ -76,12 +81,14 @@ model_2 = Model(
         for _ in range(LAYER_REPEATS)
         for layer in (
             FullyConnectedLayer(DIMENSIONALITY[1], DIMENSIONALITY[1], ReLULayer),
+            NormalizationLayer(DIMENSIONALITY[1]),
             ReLULayer(),
             DropoutLayer(DROPOUT_PROBABILITY)
         )
     ),
 
     FullyConnectedLayer(DIMENSIONALITY[1], DIMENSIONALITY[2], ReLULayer),
+    NormalizationLayer(DIMENSIONALITY[2]),
     ReLULayer(),
     DropoutLayer(DROPOUT_PROBABILITY),
 
@@ -90,12 +97,14 @@ model_2 = Model(
         for _ in range(LAYER_REPEATS)
         for layer in (
             FullyConnectedLayer(DIMENSIONALITY[2], DIMENSIONALITY[2], ReLULayer),
+            NormalizationLayer(DIMENSIONALITY[2]),
             ReLULayer(),
             DropoutLayer(DROPOUT_PROBABILITY)
         )
     ),
 
     FullyConnectedLayer(DIMENSIONALITY[2], DIMENSIONALITY[3], ReLULayer),
+    NormalizationLayer(DIMENSIONALITY[3]),
     ReLULayer(),
     DropoutLayer(DROPOUT_PROBABILITY),
 
@@ -104,12 +113,14 @@ model_2 = Model(
         for _ in range(LAYER_REPEATS)
         for layer in (
             FullyConnectedLayer(DIMENSIONALITY[3], DIMENSIONALITY[3], ReLULayer),
+            NormalizationLayer(DIMENSIONALITY[3]),
             ReLULayer(),
             DropoutLayer(DROPOUT_PROBABILITY)
         )
     ),
 
     FullyConnectedLayer(DIMENSIONALITY[3], DIMENSIONALITY[4], ReLULayer),
+    NormalizationLayer(DIMENSIONALITY[4]),
     ReLULayer(),
     DropoutLayer(DROPOUT_PROBABILITY),
 
@@ -118,6 +129,7 @@ model_2 = Model(
         for _ in range(LAYER_REPEATS)
         for layer in (
             FullyConnectedLayer(DIMENSIONALITY[4], DIMENSIONALITY[4], ReLULayer),
+            NormalizationLayer(DIMENSIONALITY[4]),
             ReLULayer(),
             DropoutLayer(DROPOUT_PROBABILITY)
         )
@@ -134,6 +146,7 @@ model_3 = Model(
     InputLayer(X_train),
 
     FullyConnectedLayer(DIMENSIONALITY[0], DIMENSIONALITY[1], ReLULayer),
+    NormalizationLayer(DIMENSIONALITY[1]),
     ReLULayer(),
     DropoutLayer(DROPOUT_PROBABILITY),
 
@@ -143,6 +156,7 @@ model_3 = Model(
             for _ in range(LAYER_REPEATS)
             for layer in (
                 FullyConnectedLayer(DIMENSIONALITY[1], DIMENSIONALITY[1], ReLULayer),
+                NormalizationLayer(DIMENSIONALITY[1]),
                 ReLULayer(),
                 DropoutLayer(DROPOUT_PROBABILITY)
             )
@@ -150,6 +164,7 @@ model_3 = Model(
     ),
 
     FullyConnectedLayer(DIMENSIONALITY[1], DIMENSIONALITY[2], ReLULayer),
+    NormalizationLayer(DIMENSIONALITY[2]),
     ReLULayer(),
     DropoutLayer(DROPOUT_PROBABILITY),
 
@@ -159,6 +174,7 @@ model_3 = Model(
             for _ in range(LAYER_REPEATS)
             for layer in (
                 FullyConnectedLayer(DIMENSIONALITY[2], DIMENSIONALITY[2], ReLULayer),
+                NormalizationLayer(DIMENSIONALITY[2]),
                 ReLULayer(),
                 DropoutLayer(DROPOUT_PROBABILITY)
             )
@@ -166,6 +182,7 @@ model_3 = Model(
     ),
 
     FullyConnectedLayer(DIMENSIONALITY[2], DIMENSIONALITY[3], ReLULayer),
+    NormalizationLayer(DIMENSIONALITY[3]),
     ReLULayer(),
     DropoutLayer(DROPOUT_PROBABILITY),
 
@@ -175,6 +192,7 @@ model_3 = Model(
             for _ in range(LAYER_REPEATS)
             for layer in (
                 FullyConnectedLayer(DIMENSIONALITY[3], DIMENSIONALITY[3], ReLULayer),
+                NormalizationLayer(DIMENSIONALITY[3]),
                 ReLULayer(),
                 DropoutLayer(DROPOUT_PROBABILITY)
             )
@@ -182,6 +200,7 @@ model_3 = Model(
     ),
 
     FullyConnectedLayer(DIMENSIONALITY[3], DIMENSIONALITY[4], ReLULayer),
+    NormalizationLayer(DIMENSIONALITY[4]),
     ReLULayer(),
     DropoutLayer(DROPOUT_PROBABILITY),
 
@@ -191,6 +210,7 @@ model_3 = Model(
             for _ in range(LAYER_REPEATS)
             for layer in (
                 FullyConnectedLayer(DIMENSIONALITY[4], DIMENSIONALITY[4], ReLULayer),
+                NormalizationLayer(DIMENSIONALITY[4]),
                 ReLULayer(),
                 DropoutLayer(DROPOUT_PROBABILITY)
             )
