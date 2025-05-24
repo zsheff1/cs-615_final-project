@@ -261,4 +261,4 @@ for training_log, model_name in zip(training_logs, ['Shallow Network', 'Deep Net
     plt.show()
 
     # print error of final epoch
-    print(f"{model_name}\nFinal RMSE of training data: {training_log[-1, 1]}\nFinal RMSE of testing data: {training_log[-1, 2]}\n")
+    print(f"{model_name}\nFinal RMSE of training data: {training_log[-1, 1].round(4)}\nFinal RMSE of testing data: {training_log[-1, 2].round(4)}\n")
