@@ -18,6 +18,7 @@ TERMINATE_RMSE = 1e-10
 DIMENSIONALITY = [22, 64, 32, 16, 8, 1]
 DROPOUT_PROBABILITY = 0.01
 LAYER_REPEATS = 5
+BATCH_SIZE = 128
 
 
 ## import data, split into training and test
@@ -235,7 +236,7 @@ for model in model_1, model_2, model_3:
 
     while (model.getEpoch() < TERMINATE_EPOCH) and (delta_rmse > TERMINATE_RMSE):
         # training
-        model.train(X_train, Y_train)
+        model.train(X_train, Y_train, BATCH_SIZE)
 
         # evaluate
         rmse_train_old = rmse_train
