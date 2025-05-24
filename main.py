@@ -13,10 +13,11 @@ import os
 ## define constants
 KAGGLE_DATASET = 'shaikasif89/wheat-yeild'
 TRAIN_TEST_SPLIT = 2/3
-TERMINATE_EPOCH = 1e1
+TERMINATE_EPOCH = 1e4
 TERMINATE_RMSE = 1e-10
 DIMENSIONALITY = [22, 64, 32, 16, 8, 1]
-DROPOUT_PROBABILITY = 0.0
+DROPOUT_PROBABILITY = 0.01
+LAYER_REPEATS = 5
 
 
 ## import data, split into training and test
