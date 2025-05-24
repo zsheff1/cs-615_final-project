@@ -9,10 +9,6 @@ from .NormalizationLayer import NormalizationLayer
 from .DropoutLayer import DropoutLayer
 from .ResidualBlock import ResidualBlock
 
-from .ConvolutionalLayer import ConvolutionalLayer
-from .MaxPoolLayer import MaxPoolLayer
-from .FlatteningLayer import FlatteningLayer
-
 from .LinearLayer import LinearLayer
 from .ReLULayer import ReLULayer
 from .LogisticSigmoidLayer import LogisticSigmoidLayer
