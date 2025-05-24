@@ -5,6 +5,12 @@ import random
 
 ##########BASE CLASS###########
 class Layer(ABC):
+    # define ADAM constants
+    RHO1 = 0.9
+    RHO2 = 0.999
+    ETA = 0.001
+    DELTA = 1e-8
+
     def __init__(self):
         self.__prevIn = []
         self.__prevOut = []

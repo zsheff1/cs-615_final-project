@@ -6,11 +6,6 @@ from .ReLULayer import ReLULayer
 import numpy as np
 
 class FullyConnectedLayer(Layer):
-    # define ADAM constants
-    RHO1 = 0.9
-    RHO2 = 0.999
-    ETA = 0.001
-    DELTA = 1e-8
 
     def __init__(self, sizeIn, sizeOut, activationFunction):
         super().__init__()
@@ -63,12 +58,12 @@ class FullyConnectedLayer(Layer):
         N = gradIn.shape[0]
 
         dJdW = (self.getPrevIn().T @ gradIn)/N
-        self.__sW = (FullyConnectedLayer.RHO1 * self.__sW) + ((1 - FullyConnectedLayer.RHO1) * dJdW)
-        self.__rW = (FullyConnectedLayer.RHO2 * self.__rW) + ((1 - FullyConnectedLayer.RHO2) * (dJdW * dJdW))
-        self.__weights -= FullyConnectedLayer.ETA * ((self.__sW / (1 - FullyConnectedLayer.RHO1 ** t)) / (np.sqrt(self.__rW / (1 - FullyConnectedLayer.RHO2 ** t)) + FullyConnectedLayer.DELTA))
+        self.__sW = (Layer.RHO1 * self.__sW) + ((1 - Layer.RHO1) * dJdW)
+        self.__rW = (Layer.RHO2 * self.__rW) + ((1 - Layer.RHO2) * (dJdW * dJdW))
+        self.__weights -= Layer.ETA * ((self.__sW / (1 - Layer.RHO1 ** t)) / (np.sqrt(self.__rW / (1 - Layer.RHO2 ** t)) + Layer.DELTA))
 
         dJdb = np.sum(gradIn, axis = 0)/N
-        self.__sb = (FullyConnectedLayer.RHO1 * self.__sb) + ((1 - FullyConnectedLayer.RHO1) * dJdb)
-        self.__rb = (FullyConnectedLayer.RHO2 * self.__rb) + ((1 - FullyConnectedLayer.RHO2) * (dJdb * dJdb))
-        self.__biases -= FullyConnectedLayer.ETA * ((self.__sb / (1 - FullyConnectedLayer.RHO1 ** t)) / (np.sqrt(self.__rb / (1 - FullyConnectedLayer.RHO2 ** t)) + FullyConnectedLayer.DELTA))
+        self.__sb = (Layer.RHO1 * self.__sb) + ((1 - Layer.RHO1) * dJdb)
+        self.__rb = (Layer.RHO2 * self.__rb) + ((1 - Layer.RHO2) * (dJdb * dJdb))
+        self.__biases -= Layer.ETA * ((self.__sb / (1 - Layer.RHO1 ** t)) / (np.sqrt(self.__rb / (1 - Layer.RHO2 ** t)) + Layer.DELTA))
 

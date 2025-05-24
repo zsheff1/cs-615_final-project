@@ -3,10 +3,6 @@ import numpy as np
 
 class NormalizationLayer(Layer):
     # define constants
-    RHO1 = 0.9
-    RHO2 = 0.999
-    ETA = 0.001
-    DELTA = 1e-8
     EPSILON = 1e-7
 
     def __init__(self, sizeIn):
@@ -63,13 +59,13 @@ class NormalizationLayer(Layer):
 
     def learn(self, gradIn, t):
         dJdbeta = np.mean(gradIn, axis = 0, keepdims = True)
-        self.__sb = (NormalizationLayer.RHO1 * self.__sb) + ((1 - NormalizationLayer.RHO1) * dJdbeta)
-        self.__rb = (NormalizationLayer.RHO2 * self.__rb) + ((1 - NormalizationLayer.RHO2) * (dJdbeta * dJdbeta))
-        self.__beta -= NormalizationLayer.ETA * ((self.__sb / (1 - NormalizationLayer.RHO1 ** t)) / (np.sqrt(self.__rb / (1 - NormalizationLayer.RHO2 ** t)) + NormalizationLayer.DELTA))
+        self.__sb = (Layer.RHO1 * self.__sb) + ((1 - Layer.RHO1) * dJdbeta)
+        self.__rb = (Layer.RHO2 * self.__rb) + ((1 - Layer.RHO2) * (dJdbeta * dJdbeta))
+        self.__beta -= Layer.ETA * ((self.__sb / (1 - Layer.RHO1 ** t)) / (np.sqrt(self.__rb / (1 - Layer.RHO2 ** t)) + Layer.DELTA))
 
         dJdgamma = np.mean(gradIn * self.getPrevOut(), axis = 0, keepdims = True)
-        self.__sg = (NormalizationLayer.RHO1 * self.__sg) + ((1 - NormalizationLayer.RHO1) * dJdgamma)
-        self.__rg = (NormalizationLayer.RHO2 * self.__rg) + ((1 - NormalizationLayer.RHO2) * (dJdgamma * dJdgamma))
-        self.__gamma -= NormalizationLayer.ETA * ((self.__sg / (1 - NormalizationLayer.RHO1 ** t)) / (np.sqrt(self.__rg / (1 - NormalizationLayer.RHO2 ** t)) + NormalizationLayer.DELTA))
+        self.__sg = (Layer.RHO1 * self.__sg) + ((1 - Layer.RHO1) * dJdgamma)
+        self.__rg = (Layer.RHO2 * self.__rg) + ((1 - Layer.RHO2) * (dJdgamma * dJdgamma))
+        self.__gamma -= Layer.ETA * ((self.__sg / (1 - Layer.RHO1 ** t)) / (np.sqrt(self.__rg / (1 - Layer.RHO2 ** t)) + Layer.DELTA))
 
     
