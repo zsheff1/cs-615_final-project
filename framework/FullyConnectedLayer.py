@@ -2,9 +2,6 @@ from .Layer import Layer
 
 from .LinearLayer import LinearLayer
 from .ReLULayer import ReLULayer
-from .LogisticSigmoidLayer import LogisticSigmoidLayer
-from .TanhLayer import TanhLayer
-from .SoftmaxLayer import SoftmaxLayer
 
 import numpy as np
 
@@ -20,17 +17,12 @@ class FullyConnectedLayer(Layer):
 
         # initialize weights and biases
         # standard initialization
-        if activationFunction in [LinearLayer, SoftmaxLayer]:
+        if activationFunction == LinearLayer:
             range = 1e-4
             self.__weights = np.random.uniform(low = -range, high = range, size = (sizeIn, sizeOut))
             self.__biases = np.random.uniform(low = -range, high = range, size = (1, sizeOut))
-        # xavier initialization
-        elif activationFunction in [LogisticSigmoidLayer, TanhLayer]:
-            range = np.sqrt(6 / (sizeIn + sizeOut))
-            self.__weights = np.random.uniform(low = -range, high = range, size = (sizeIn, sizeOut))
-            self.__biases = np.zeros((1, sizeOut))
         # he initialization
-        elif activationFunction in [ReLULayer]:
+        elif activationFunction == ReLULayer:
             std = np.sqrt(2 / sizeIn)
             self.__weights = np.random.normal(loc = 0, scale = std, size = (sizeIn, sizeOut))
             self.__biases = np.zeros((1, sizeOut))
