@@ -42,27 +42,18 @@ class ResidualBlock(Layer):
             gradMain = self.__layers[i].backward(gradMain)
 
         gradResidual = self.__projection.gradient()
-        
-        print("gradMain shape:", (gradMain).shape)
-        print("gradResidual shape:", (gradResidual).shape)
-        print("gradMain + gradResidual shape:", (gradMain + gradResidual).shape)
 
-        gradOut = np.stack([gradMain + gradResidual] * len(self.getPrevIn()), axis=0)
+        gradOut = np.atleast_2d(gradMain + gradResidual)
         return gradOut
 
     def backward(self, gradIn):
         sg = self.gradient()
 
-        print("gradIn shape:", gradIn.shape)  # Expected (batch_size, output_dim)
-        print("sg shape:", sg.shape)  # Expected (batch_size, output_dim, input_dim)
-
-
-        gradOut = np.zeros((gradIn.shape[0],sg.shape[2]))
+        gradOut = np.zeros((gradIn.shape[0],sg.shape[1]))
 
         for n in range(gradIn.shape[0]):
-            print("gradIn[n] shape:", np.atleast_2d(gradIn[n]).shape)  # Should be (1, output_dim)
-            print("sg[n] shape:", sg[n].shape)  # Should be (output_dim, input_dim)
             gradOut[n] = np.atleast_2d(gradIn[n])@sg[n]
+
         return gradOut
 
     def learn(self, gradIn, t):
