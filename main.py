@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 ## import modules
-import math
 import kagglehub
 import numpy as np
 from framework import (
@@ -25,7 +24,7 @@ data_dir = kagglehub.dataset_download(KAGGLE_DATASET)
 data_path = os.path.join(data_dir, os.listdir(data_dir)[0])
 data = np.genfromtxt(data_path, delimiter=',', skip_header=1)
 
-n_train = math.floor(data.shape[0] * TRAIN_TEST_SPLIT)
+n_train = int(data.shape[0] * TRAIN_TEST_SPLIT)
 training_indices = np.random.choice(data.shape[0], size=n_train, replace=False)
 mask = np.zeros(data.shape[0], dtype=bool)
 mask[training_indices] = True
