@@ -2,22 +2,26 @@
 
 ## import modules
 import math
+import kagglehub
 import numpy as np
 from framework import (
     Model, InputLayer, ResidualBlock, FullyConnectedLayer, ReLULayer, DropoutLayer, LinearLayer, SquaredError
 )
 import matplotlib.pyplot as plt
+import os
 
 
 ## define constants
-DATA_PATH = 'medical.csv'
+KAGGLE_DATASET = 'shaikasif89/wheat-yeild'
 TRAIN_TEST_SPLIT = 2/3
 TERMINATE_EPOCH = 1e1
 TERMINATE_RMSE = 1e-10
 
 
 ## import data, split into training and test
-data = np.genfromtxt(DATA_PATH, delimiter=',', skip_header=1)
+data_dir = kagglehub.dataset_download(KAGGLE_DATASET)
+data_path = os.path.join(data_dir, os.listdir(data_dir)[0])
+data = np.genfromtxt(data_path, delimiter=',', skip_header=1)
 
 n_train = math.floor(data.shape[0] * TRAIN_TEST_SPLIT)
 training_indices = np.random.choice(data.shape[0], size=n_train, replace=False)
