@@ -16,6 +16,8 @@ KAGGLE_DATASET = 'shaikasif89/wheat-yeild'
 TRAIN_TEST_SPLIT = 2/3
 TERMINATE_EPOCH = 1e1
 TERMINATE_RMSE = 1e-10
+DIMENSIONALITY = [22, 64, 32, 16, 8, 1]
+DROPOUT_PROBABILITY = 0.0
 
 
 ## import data, split into training and test
@@ -36,21 +38,20 @@ Y_test = data[~mask, -1].reshape(-1, 1)
 
 ## instantiate models
 # shallow model
-DIMENSIONALITY = [9, 1]
-
 model_1 = Model(
     InputLayer(X_train),
 
-    FullyConnectedLayer(DIMENSIONALITY[0], DIMENSIONALITY[1], ReLULayer),
+    FullyConnectedLayer(DIMENSIONALITY[0], DIMENSIONALITY[0], ReLULayer),
     ReLULayer(),
+    DropoutLayer(DROPOUT_PROBABILITY),
+
+    FullyConnectedLayer(DIMENSIONALITY[0], DIMENSIONALITY[-1], LinearLayer),
+    LinearLayer(),
 
     SquaredError()
 )
 
 # deep model without skip residuals
-DIMENSIONALITY = [9, 18, 32, 18, 9, 1]
-DROPOUT_PROBABILITY = 0.1
-
 model_2 = Model(
     InputLayer(X_train),
 
@@ -77,9 +78,6 @@ model_2 = Model(
 )
 
 # deep model with skip residuals
-DIMENSIONALITY = [9, 18, 32, 18, 9, 1]
-DROPOUT_PROBABILITY = 0.1
-
 model_3 = Model(
     InputLayer(X_train),
 
@@ -87,14 +85,10 @@ model_3 = Model(
         FullyConnectedLayer(DIMENSIONALITY[0], DIMENSIONALITY[0], ReLULayer),
         ReLULayer(),
         DropoutLayer(DROPOUT_PROBABILITY),
-
-        FullyConnectedLayer(DIMENSIONALITY[0], DIMENSIONALITY[0], ReLULayer),
-        ReLULayer(),
-        DropoutLayer(DROPOUT_PROBABILITY),
     ),
 
-        FullyConnectedLayer(DIMENSIONALITY[0], DIMENSIONALITY[-1], ReLULayer),
-        LinearLayer(),
+    FullyConnectedLayer(DIMENSIONALITY[0], DIMENSIONALITY[-1], LinearLayer),
+    LinearLayer(),
 
     SquaredError()
 )
