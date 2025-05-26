@@ -230,23 +230,21 @@ model_3 = Model(
 training_logs = []
 training_times = []
 for model in model_1, model_2, model_3:
-
     # initialize helper variables
     rmse_train = float('inf')
     delta_rmse = float('inf')
     rows = []
     start = time.perf_counter()
     while (model.getEpoch() < TERMINATE_EPOCH) and (delta_rmse > TERMINATE_RMSE):
+        epoch = model.getEpoch()
         # training
         model.train(X_train, Y_train, BATCH_SIZE)
-
         # evaluate
         rmse_train_old = rmse_train
         rmse_train = model.eval(X_train, Y_train, "RMSE")
         rmse_test = model.eval(X_test, Y_test, "RMSE")
-        
         # update termination criteria
-        rows.append([model.getEpoch(), rmse_train, rmse_test])
+        rows.append([epoch, rmse_train, rmse_test])
         delta_rmse = abs(rmse_train - rmse_train_old)
     end = time.perf_counter()
     # save results
