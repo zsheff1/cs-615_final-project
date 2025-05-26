@@ -8,6 +8,7 @@ from framework import (
 )
 import matplotlib.pyplot as plt
 import os
+import time
 
 
 ## define constants
@@ -227,13 +228,14 @@ model_3 = Model(
 
 ## train models
 training_logs = []
+training_times = []
 for model in model_1, model_2, model_3:
 
     # initialize helper variables
     rmse_train = float('inf')
     delta_rmse = float('inf')
     rows = []
-
+    start = time.perf_counter()
     while (model.getEpoch() < TERMINATE_EPOCH) and (delta_rmse > TERMINATE_RMSE):
         # training
         model.train(X_train, Y_train, BATCH_SIZE)
@@ -246,13 +248,17 @@ for model in model_1, model_2, model_3:
         # update termination criteria
         rows.append([model.getEpoch(), rmse_train, rmse_test])
         delta_rmse = abs(rmse_train - rmse_train_old)
-
+    end = time.perf_counter()
     # save results
     training_logs.append(np.array(rows))
+    training_times.append(end - start)
 
 
 ## display results
-for training_log, model_name in zip(training_logs, ['Shallow Network', 'Deep Network', 'Deep Network With Skip Residuals']):
+for training_log, training_time, model_name in zip(training_logs, training_times ['Shallow Network', 'Deep Network', 'Deep Network With Skip Residuals']):
+    # print error of final epoch
+    print(f"{model_name}\nTime spend training model (seconds): {training_time}\nFinal RMSE of training data: {training_log[-1, 1].round(4)}\nFinal RMSE of testing data: {training_log[-1, 2].round(4)}\n")
+    # plot RMSE vs epoch
     plt.plot(training_log[:, 0], training_log[:, 1], label='Training')
     plt.plot(training_log[:, 0], training_log[:, 2], label='Testing')
     plt.title(model_name)
@@ -261,6 +267,3 @@ for training_log, model_name in zip(training_logs, ['Shallow Network', 'Deep Net
     plt.legend()
     plt.grid(True)
     plt.show()
-
-    # print error of final epoch
-    print(f"{model_name}\nFinal RMSE of training data: {training_log[-1, 1].round(4)}\nFinal RMSE of testing data: {training_log[-1, 2].round(4)}\n")
