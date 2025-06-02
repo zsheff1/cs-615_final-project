@@ -15,7 +15,6 @@ from framework import (
 KAGGLE_DATASET = 'shaikasif89/wheat-yeild'
 TRAIN_TEST_SPLIT = 2/3
 TERMINATE_EPOCH = 1e4
-TERMINATE_RMSE = 5e-6
 DIMENSIONALITY = [22, 64, 32, 16, 8, 1]
 DROPOUT_PROBABILITY = 0.2
 LAYERS_PER_BLOCK = 2
@@ -48,18 +47,22 @@ model_1 = Model(
     InputLayer(X_train),
 
     FullyConnectedLayer(DIMENSIONALITY[0], DIMENSIONALITY[1], ReLULayer),
+    NormalizationLayer(DIMENSIONALITY[1]),
     ReLULayer(),
     DropoutLayer(DROPOUT_PROBABILITY),
 
     FullyConnectedLayer(DIMENSIONALITY[1], DIMENSIONALITY[2], ReLULayer),
+    NormalizationLayer(DIMENSIONALITY[2]),
     ReLULayer(),
     DropoutLayer(DROPOUT_PROBABILITY),
 
     FullyConnectedLayer(DIMENSIONALITY[2], DIMENSIONALITY[3], ReLULayer),
+    NormalizationLayer(DIMENSIONALITY[3]),
     ReLULayer(),
     DropoutLayer(DROPOUT_PROBABILITY),
 
     FullyConnectedLayer(DIMENSIONALITY[3], DIMENSIONALITY[4], ReLULayer),
+    NormalizationLayer(DIMENSIONALITY[4]),
     ReLULayer(),
     DropoutLayer(DROPOUT_PROBABILITY),
 
@@ -78,60 +81,96 @@ model_2 = Model(
     DropoutLayer(DROPOUT_PROBABILITY),
 
     *(
-        layer
-        for _ in range(LAYERS_PER_BLOCK * BLOCKS_PER_STAGE)
-        for layer in (
+        block
+        for _ in range(BLOCKS_PER_STAGE)
+        for block in (
+            *(
+                layer
+                for _ in range(LAYERS_PER_BLOCK-1)
+                for layer in (
+                    FullyConnectedLayer(DIMENSIONALITY[1], DIMENSIONALITY[1], ReLULayer),
+                    ReLULayer(),
+                    DropoutLayer(DROPOUT_PROBABILITY)
+                )
+            ),
             FullyConnectedLayer(DIMENSIONALITY[1], DIMENSIONALITY[1], ReLULayer),
+            NormalizationLayer(DIMENSIONALITY[1]),
             ReLULayer(),
             DropoutLayer(DROPOUT_PROBABILITY)
         )
     ),
-    NormalizationLayer(DIMENSIONALITY[1]),
 
     FullyConnectedLayer(DIMENSIONALITY[1], DIMENSIONALITY[2], ReLULayer),
     ReLULayer(),
     DropoutLayer(DROPOUT_PROBABILITY),
 
     *(
-        layer
-        for _ in range(LAYERS_PER_BLOCK * BLOCKS_PER_STAGE)
-        for layer in (
+        block
+        for _ in range(BLOCKS_PER_STAGE)
+        for block in (
+            *(
+                layer
+                for _ in range(LAYERS_PER_BLOCK-1)
+                for layer in (
+                    FullyConnectedLayer(DIMENSIONALITY[2], DIMENSIONALITY[2], ReLULayer),
+                    ReLULayer(),
+                    DropoutLayer(DROPOUT_PROBABILITY)
+                )
+            ),
             FullyConnectedLayer(DIMENSIONALITY[2], DIMENSIONALITY[2], ReLULayer),
+            NormalizationLayer(DIMENSIONALITY[2]),
             ReLULayer(),
             DropoutLayer(DROPOUT_PROBABILITY)
         )
     ),
-    NormalizationLayer(DIMENSIONALITY[2]),
 
     FullyConnectedLayer(DIMENSIONALITY[2], DIMENSIONALITY[3], ReLULayer),
     ReLULayer(),
     DropoutLayer(DROPOUT_PROBABILITY),
 
     *(
-        layer
-        for _ in range(LAYERS_PER_BLOCK * BLOCKS_PER_STAGE)
-        for layer in (
+        block
+        for _ in range(BLOCKS_PER_STAGE)
+        for block in (
+            *(
+                layer
+                for _ in range(LAYERS_PER_BLOCK-1)
+                for layer in (
+                    FullyConnectedLayer(DIMENSIONALITY[3], DIMENSIONALITY[3], ReLULayer),
+                    ReLULayer(),
+                    DropoutLayer(DROPOUT_PROBABILITY)
+                )
+            ),
             FullyConnectedLayer(DIMENSIONALITY[3], DIMENSIONALITY[3], ReLULayer),
+            NormalizationLayer(DIMENSIONALITY[3]),
             ReLULayer(),
             DropoutLayer(DROPOUT_PROBABILITY)
         )
     ),
-    NormalizationLayer(DIMENSIONALITY[3]),
 
     FullyConnectedLayer(DIMENSIONALITY[3], DIMENSIONALITY[4], ReLULayer),
     ReLULayer(),
     DropoutLayer(DROPOUT_PROBABILITY),
 
     *(
-        layer
-        for _ in range(LAYERS_PER_BLOCK * BLOCKS_PER_STAGE)
-        for layer in (
+        block
+        for _ in range(BLOCKS_PER_STAGE)
+        for block in (
+            *(
+                layer
+                for _ in range(LAYERS_PER_BLOCK-1)
+                for layer in (
+                    FullyConnectedLayer(DIMENSIONALITY[4], DIMENSIONALITY[4], ReLULayer),
+                    ReLULayer(),
+                    DropoutLayer(DROPOUT_PROBABILITY)
+                )
+            ),
             FullyConnectedLayer(DIMENSIONALITY[4], DIMENSIONALITY[4], ReLULayer),
+            NormalizationLayer(DIMENSIONALITY[4]),
             ReLULayer(),
             DropoutLayer(DROPOUT_PROBABILITY)
         )
     ),
-    NormalizationLayer(DIMENSIONALITY[4]),
 
     FullyConnectedLayer(DIMENSIONALITY[4], DIMENSIONALITY[5], LinearLayer),
     LinearLayer(),
@@ -247,21 +286,17 @@ training_logs = []
 training_times = []
 for model in model_1, model_2, model_3:
     # initialize helper variables
-    rmse_train = float('inf')
-    delta_rmse = float('inf')
     rows = []
     start = time.perf_counter()
-    while (model.getEpoch() < TERMINATE_EPOCH) and (delta_rmse > TERMINATE_RMSE):
+    while model.getEpoch() < TERMINATE_EPOCH:
         epoch = model.getEpoch()
         # training
         model.train(X_train, Y_train, BATCH_SIZE)
         # evaluate
-        rmse_train_old = rmse_train
         rmse_train = model.eval(X_train, Y_train, "RMSE")
         rmse_test = model.eval(X_test, Y_test, "RMSE")
-        # update termination criteria
+        # log evaluation output
         rows.append([epoch, rmse_train, rmse_test])
-        delta_rmse = abs(rmse_train - rmse_train_old)
     end = time.perf_counter()
     # save results
     training_logs.append(np.array(rows))
